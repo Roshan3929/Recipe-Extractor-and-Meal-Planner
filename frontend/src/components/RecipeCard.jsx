@@ -4,11 +4,7 @@ import { logger } from "../utils/logger"
 export default function RecipeCard({ recipe }) {
   useEffect(() => {
     if (recipe) {
-      logger.info(`📋 Recipe Card displayed: ${recipe.title}`, {
-        cuisine: recipe.cuisine,
-        difficulty: recipe.difficulty,
-        servings: recipe.servings
-      })
+      logger.info(`Recipe card displayed: ${recipe.title}`)
     }
   }, [recipe])
 
@@ -113,6 +109,7 @@ export default function RecipeCard({ recipe }) {
 }
 
 function Card({ title, children, style }) {
+  """Display a styled card container."""
   return (
     <div style={{ background: "#fff", border: "1.5px solid #EDE8DF", borderRadius: "12px", padding: "22px", marginBottom: "0", ...style }}>
       <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.8px", color: "#8B8378", fontWeight: 500, marginBottom: "14px" }}>{title}</div>
@@ -122,6 +119,7 @@ function Card({ title, children, style }) {
 }
 
 function Badge({ label, type }) {
+  """Display a styled badge label."""
   const styles = {
     cuisine: { background: "#E8845A22", color: "#E8845A", border: "1px solid #E8845A44" },
     easy: { background: "#22c55e22", color: "#16a34a", border: "1px solid #22c55e44" },

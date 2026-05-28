@@ -20,13 +20,12 @@ export default function App() {
   }, [activeTab])
 
 const fetchHistory = async () => {
+  """Fetch and load recipe history for current session."""
   try {
     const res = await getHistory()
     const recipes = res.data.recipes || res.data
-    console.log("Recipes to display:", recipes)
     setHistory(recipes)
   } catch (e) {
-    console.log("History error:", e)
     setError("Failed to load history")
   }
 }

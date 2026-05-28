@@ -20,11 +20,7 @@ llm = ChatGoogleGenerativeAI(
 
 @tool
 def fetch_recipe_ingredients(recipe_ids: str) -> str:
-    """
-    Fetch ingredients for a list of recipe IDs from the database.
-    Input: comma-separated recipe IDs e.g. '1,2,3'
-    Output: JSON list of ingredients with recipe title, quantity, unit, item
-    """
+    """Fetch ingredients for a list of recipe IDs from the database."""
     db = SessionLocal()
     try:
         ids = [int(id.strip()) for id in recipe_ids.split(",")]
@@ -53,11 +49,7 @@ def fetch_recipe_ingredients(recipe_ids: str) -> str:
 
 @tool
 def merge_quantities(ingredients_json: str) -> str:
-    """
-    Merge duplicate ingredients across recipes by combining quantities.
-    Input: JSON string of ingredients list from fetch_recipe_ingredients
-    Output: JSON list of merged ingredients
-    """
+    """Merge duplicate ingredients across recipes by combining quantities."""
     try:
         ingredients = json.loads(ingredients_json)
         merged = {}
@@ -169,11 +161,7 @@ def _parse_quantity(quantity_str: str) -> tuple[float, str]:
 
 @tool
 def group_by_category(ingredients_json: str) -> str:
-    """
-    Group merged ingredients by shopping category.
-    Input: JSON string of merged ingredients
-    Output: JSON object grouped by category
-    """
+    """Group merged ingredients by shopping category."""
     try:
         ingredients = json.loads(ingredients_json)
 
@@ -239,6 +227,7 @@ llm_with_tools = llm.bind_tools(list(TOOLS.values()))
 
 
 async def generate_meal_plan(recipe_ids: list[int]) -> dict:
+    """Generate a combined shopping list from multiple recipes by merging and categorizing ingredients."""
     try:
         ids_str = ", ".join(str(id) for id in recipe_ids)
 

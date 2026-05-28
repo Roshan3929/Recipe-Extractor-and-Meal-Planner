@@ -1,4 +1,3 @@
-// All fetch calls in one place
 import axios from "axios"
 import { logger } from "../utils/logger"
 
@@ -6,6 +5,7 @@ const BASE_URL = "http://localhost:8000"
 
 // generate or retrieve session id
 export const getSessionId = () => {
+  """Generate or retrieve persistent session ID from local storage."""
   let id = localStorage.getItem("session_id")
   if (!id) {
     id = crypto.randomUUID()
@@ -16,6 +16,7 @@ export const getSessionId = () => {
 }
 
 export const extractRecipe = (url) => {
+  """Extract recipe from URL via API."""
   logger.apiCall("POST", "/extract", { url, sessionId: getSessionId() })
   return axios.post(`${BASE_URL}/extract`, {
     url,
@@ -30,6 +31,7 @@ export const extractRecipe = (url) => {
 }
 
 export const getHistory = () => {
+  """Fetch recipe history for current session from API."""
   logger.apiCall("GET", "/recipes", { sessionId: getSessionId() })
   return axios.get(`${BASE_URL}/recipes`, {
     params: { session_id: getSessionId() }
@@ -43,12 +45,14 @@ export const getHistory = () => {
 }
 
 export const clearHistory = () =>
+  """Clear all saved recipes for current session via API."""
   axios.delete(`${BASE_URL}/recipes/clear`, {
     params: { session_id: getSessionId() }
   })
 
   
 export const getRecipeDetail = (id) => {
+  """Fetch detailed recipe information by ID from API."""
   logger.apiCall("GET", `/recipes/${id}`, { sessionId: getSessionId() })
   return axios.get(`${BASE_URL}/recipes/${id}`, {
     params: { session_id: getSessionId() }
@@ -62,6 +66,7 @@ export const getRecipeDetail = (id) => {
 }
 
 export const generateMealPlan = (recipeIds) => {
+  """Generate combined shopping list from multiple recipes via API."""
   logger.apiCall("POST", "/meal-plan", { recipeCount: recipeIds.length, sessionId: getSessionId() })
   return axios.post(`${BASE_URL}/meal-plan`, {
     recipe_ids: recipeIds,

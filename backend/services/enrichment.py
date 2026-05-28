@@ -32,37 +32,27 @@ async def get_grounding_data(recipe_title: str) -> dict:
     }
 
     try:
-        logger.debug(f"📊 Running 3 parallel grounding searches")
+        logger.info(f"✅ Grounding data collected: {len(grounding)} fields")
         results = await asyncio.gather(*tasks.values(), return_exceptions=True)
         keyed = dict(zip(tasks.keys(), results))
-
-        for key, val in keyed.items():
-            if not isinstance(val, Exception):
-                print(f"\n[Tavily] {key} results:")
-                if isinstance(val, dict) and "results" in val:
-                    for r in val["results"]:
-                        print(f"  URL: {r.get('url')}")
-                        print(f"  Content: {r.get('content', '')[:150]}")
-            else:
-                print(f"[Tavily] {key} failed: {val}")
 
         if not isinstance(keyed.get("nutrition"), Exception):
             nutrition = _parse_nutrition_from_results(keyed["nutrition"])
             if nutrition:
                 grounding["nutrition"] = nutrition
-                logger.debug(f"✅ Nutrition data found: {nutrition}")
+                logger.info(f"✅ Nutrition data found: {nutrition}")
 
         if not isinstance(keyed.get("cuisine"), Exception):
             cuisine = _parse_cuisine_from_results(keyed["cuisine"], recipe_title)
             if cuisine:
                 grounding["cuisine"] = cuisine
-                logger.debug(f"✅ Cuisine data found: {cuisine}")
+                logger.info(f"✅ Cuisine data found: {cuisine}")
 
         if not isinstance(keyed.get("times"), Exception):
             times = _parse_times_from_results(keyed["times"])
             if times:
                 grounding.update(times)
-                logger.debug(f"✅ Time data found: {times}")
+                logger.info(f"✅ Time data found: {times}")
 
         logger.info(f"✅ Grounding data collected: {len(grounding)} fields")
     except Exception as e:
@@ -72,6 +62,7 @@ async def get_grounding_data(recipe_title: str) -> dict:
 
 
 def _parse_nutrition_from_results(results) -> dict:
+    """Extract nutrition information (calories, protein, carbs, fat) from search results."""
     import re
 
     content = ""
@@ -132,6 +123,7 @@ def _parse_nutrition_from_results(results) -> dict:
 
 
 def _parse_cuisine_from_results(results, title: str) -> str:
+    """Extract cuisine type from search results based on known cuisine keywords."""
     content = ""
     if isinstance(results, dict) and "results" in results:
         for r in results["results"]:
@@ -157,6 +149,7 @@ def _parse_cuisine_from_results(results, title: str) -> str:
 
 
 def _parse_times_from_results(results) -> dict:
+    """Extract preparation and cook times from search results."""
     import re
     content = ""
     if isinstance(results, dict) and "results" in results:

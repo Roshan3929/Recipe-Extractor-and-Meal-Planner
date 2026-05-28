@@ -24,7 +24,6 @@ async def create_meal_plan(payload: MealPlanRequest, db: Session = Depends(get_d
         raise HTTPException(status_code=400, detail="Maximum 5 recipes allowed")
 
     # verify all recipes belong to this session
-    logger.debug(f"🔍 Verifying recipe ownership...")
     for recipe_id in payload.recipe_ids:
         recipe = db.query(models.Recipe).filter_by(
             id=recipe_id,

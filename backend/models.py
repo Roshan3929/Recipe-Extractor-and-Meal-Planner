@@ -1,4 +1,3 @@
-# All SQLAlchemy table definitions
 from database import Base
 from sqlalchemy import Column, String, Integer, Text, DateTime, ForeignKey
 from datetime import datetime

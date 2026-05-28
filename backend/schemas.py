@@ -4,8 +4,6 @@ from typing import Optional, List, Dict
 from datetime import datetime
 
 
-# --- Request Schemas ---
-
 class ExtractRequest(BaseModel):
     url: str
     session_id: str
@@ -28,8 +26,6 @@ class NutritionSchema(BaseModel):
     carbs: Optional[str] = None
     fat: Optional[str] = None
 
-
-# --- Response Schemas ---
 
 class RecipeResponse(BaseModel):
     id: int

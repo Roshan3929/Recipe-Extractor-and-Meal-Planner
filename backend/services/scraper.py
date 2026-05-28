@@ -23,15 +23,21 @@ _client = httpx.AsyncClient(
 )
 
 async def scrape_recipe(url: str) -> str:
-    logger.info(f"🔍 Starting recipe scrape for URL: {url}")
+    try:
+        
+        logger.info(f"🔍 Starting recipe scrape for URL: {url}")
     # validate URL format before making any request
     if not url.startswith(("http://", "https://")):
         logger.warning(f"❌ Invalid URL format: {url}")
         raise ValueError("Invalid URL — must start with http:// or https://")
 
     try:
-        
-        logger.debug(f"📡 Sending HTTP request to {url}")
+        logger.info(f"🔍 Starting recipe scrape for URL: {url}")
+        # validate URL format before making any request
+        if not url.startswith(("http://", "https://")):
+            logger.warning(f"❌ Invalid URL format: {url}")
+            raise ValueError("Invalid URL — must start with http:// or https://")
+
         response = await _client.get(url)
         response.raise_for_status()
         logger.info(f"✅ HTTP request successful (status {response.status_code})")
@@ -43,7 +49,6 @@ async def scrape_recipe(url: str) -> str:
             raise ValueError(f"URL does not point to an HTML page (got {content_type})")
 
         soup = BeautifulSoup(response.text, "html.parser")
-        logger.debug(f"🍜 Parsing HTML content")
 
         # strategy 1: JSON-LD
         json_ld = _extract_json_ld(soup)
@@ -52,14 +57,12 @@ async def scrape_recipe(url: str) -> str:
             return json_ld
 
         # strategy 2: targeted HTML
-        logger.debug(f"📋 Trying targeted HTML extraction")
         targeted = _extract_targeted(soup)
         if targeted and len(targeted) > 200:
             text = targeted
             logger.info(f"✅ Recipe extracted via targeted HTML ({len(text)} chars)")
         else:
             # strategy 3: full text fallback
-            logger.debug(f"📄 Falling back to full text extraction")
             text = _extract_full_text(soup)
             logger.info(f"✅ Recipe extracted via full text ({len(text)} chars)")
 
@@ -191,8 +194,6 @@ def _find_recipe_title(data) -> str:
         )
         if is_recipe:
             name = data.get("name") or data.get("headline") or ""
-            print(f"[DEBUG] Found Recipe object, name: '{name}'")
-            print(f"[DEBUG] All top-level keys: {list(data.keys())[:10]}")
             return name
         
 
@@ -267,4 +268,3 @@ def _is_recipe_page(text: str) -> bool:
 if __name__ == "__main__":
     import asyncio
     text = asyncio.run(scrape_recipe("https://www.mycookingjourney.com/appam-vegetable-stew-kerala/"))
-    print(text[:-1])

@@ -21,6 +21,9 @@ export default function HistoryTable({ recipes, onDetails, onClear }) {
   // add useState import at top
   // import { useState } from "react"
 
+  // add useState import at top
+  // import { useState } from "react"
+
   if (!recipes.length) return (
     <div style={{ textAlign: "center", padding: "60px 0", color: "#8B8378" }}>
       <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: "20px", marginBottom: "8px" }}>No recipes yet</div>

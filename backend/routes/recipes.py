@@ -18,6 +18,7 @@ router = APIRouter()
 
 # centralized error response structure
 def error_response(status_code: int, message: str, detail: str = None):
+    """Create a standardized HTTP error response."""
     return HTTPException(
         status_code=status_code,
         detail={
@@ -80,7 +81,6 @@ async def extract(payload: ExtractRequest, db: Session = Depends(get_db)):
     recipe_title = _extract_title_hint(raw_text, url)
     if not recipe_title:
         recipe_title = extract_title_from_url(url)
-    print(f"[DEBUG] Final title hint: '{recipe_title}'")
 
     needs_grounding = _needs_enrichment(raw_text)
 
@@ -125,7 +125,7 @@ async def extract(payload: ExtractRequest, db: Session = Depends(get_db)):
                 unit=ing.get("unit"),
                 item=ing.get("item")
             ))
-        logger.debug(f"✅ Saved {len(ingredients)} ingredients")
+        logger.info(f"✅ Saved {len(ingredients)} ingredients")
 
         instructions = data.get("instructions") or []
         for ins in instructions:
@@ -134,7 +134,7 @@ async def extract(payload: ExtractRequest, db: Session = Depends(get_db)):
                 step_number=ins.get("step_number"),
                 instruction_text=ins.get("instruction_text")
             ))
-        logger.debug(f"✅ Saved {len(instructions)} instructions")
+        logger.info(f"✅ Saved {len(instructions)} instructions")
 
         nutrition = data.get("nutrition_estimate") or {}
         db.add(models.Nutrition(
@@ -144,7 +144,7 @@ async def extract(payload: ExtractRequest, db: Session = Depends(get_db)):
             carbs=nutrition.get("carbs"),
             fat=nutrition.get("fat")
         ))
-        logger.debug(f"✅ Saved nutrition data")
+        logger.info(f"✅ Saved nutrition data")
 
         substitutions = data.get("substitutions") or []
         for sub in substitutions:
@@ -152,7 +152,7 @@ async def extract(payload: ExtractRequest, db: Session = Depends(get_db)):
                 recipe_id=recipe.id,
                 substitution_text=sub
             ))
-        logger.debug(f"✅ Saved {len(substitutions)} substitutions")
+        logger.info(f"✅ Saved {len(substitutions)} substitutions")
 
         shopping_list = data.get("shopping_list") or {}
         if isinstance(shopping_list, dict):
@@ -164,7 +164,7 @@ async def extract(payload: ExtractRequest, db: Session = Depends(get_db)):
                             category=category,
                             item=item
                         ))
-        logger.debug(f"✅ Saved shopping list data")
+        logger.info(f"✅ Saved shopping list data")
 
         related_recipes = data.get("related_recipes") or []
         for related in related_recipes:
@@ -172,7 +172,7 @@ async def extract(payload: ExtractRequest, db: Session = Depends(get_db)):
                 recipe_id=recipe.id,
                 related_title=related
             ))
-        logger.debug(f"✅ Saved {len(related_recipes)} related recipes")
+        logger.info(f"✅ Saved {len(related_recipes)} related recipes")
 
         db.commit()
         logger.info(f"✅ All recipe data saved successfully")
@@ -215,6 +215,7 @@ async def clear_history(session_id: str, db: Session = Depends(get_db)):
     
 
 def build_response(recipe: models.Recipe, db: Session) -> RecipeResponse:
+    """Build a complete RecipeResponse object from database models."""
     ingredients = db.query(models.Ingredient).filter_by(recipe_id=recipe.id).all()
     instructions = db.query(models.Instruction).filter_by(
         recipe_id=recipe.id

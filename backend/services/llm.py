@@ -28,6 +28,7 @@ recipe_chain = recipe_prompt | llm
 REQUIRED_FIELDS = ["title", "ingredients", "instructions"]
 
 async def extract_recipe(scraped_text: str, grounding_data: dict = None) -> dict:
+    """Extract structured recipe data from scraped HTML and grounding information using LLM."""
     try:
         grounding_str = json.dumps(grounding_data, indent=2) if grounding_data else "No grounding data available."
         result = await recipe_chain.ainvoke({
